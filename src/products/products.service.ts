@@ -1,20 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 
 @Injectable()
 export class ProductsService {
-  private products: Product[] = [new Product('Cheese', 1000)];
+  private products: Product[] = [
+    new Product({ name: 'Cheese', price: 1000, barcode: '1984asd3434d' }),
+  ];
 
   create(createProductDto: CreateProductDto) {
-    this.products.push(
-      new Product(createProductDto.name, createProductDto.price),
-    );
+    this.products.push(new Product(createProductDto));
   }
 
   findAll() {
-    return [...this.products];
+    return this.products.map((product) => plainToInstance(Product, product));
   }
 
   findOne(id: number) {
@@ -24,33 +25,19 @@ export class ProductsService {
       throw new NotFoundException('Product not found!');
     }
 
-    return { ...product };
+    return plainToInstance(Product, product);
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
-    let product = this.findProductById(id);
+    const product = this.findProductById(id);
 
     if (!product) {
       throw new NotFoundException('Product not found!');
     }
 
-    // console.log(updateProductDto);
+    Object.assign(product, updateProductDto);
 
-    // product.set(key, updateProductDto[key as keyof UpdateProductDto]);
-
-    // if (!product.hasOwnProperty(key as keyof Product)) {
-    //   continue;
-    // }
-
-    for (const key in updateProductDto) {
-      console.log(product[key as keyof Omit<Product, 'id'>]);
-      console.log(updateProductDto[key as keyof UpdateProductDto]);
-
-      product[key as keyof Omit<Product, 'id'>] =
-        updateProductDto[key as keyof UpdateProductDto];
-    }
-
-    return { ...product };
+    return plainToInstance(Product, product);
   }
 
   remove(id: number) {

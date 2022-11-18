@@ -8,4 +8,8 @@ export class CreateProductDto {
   @IsNumber()
   @IsNotEmpty()
   public price: number;
+
+  @IsString()
+  @IsNotEmpty()
+  public barcode: string;
 }
