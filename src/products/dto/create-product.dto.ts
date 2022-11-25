@@ -3,13 +3,13 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
-  public name: string;
+  public readonly name: string;
 
   @IsNumber()
   @IsNotEmpty()
-  public price: number;
+  public readonly price: number;
 
   @IsString()
   @IsNotEmpty()
-  public barcode: string;
+  public readonly barcode: string;
 }
