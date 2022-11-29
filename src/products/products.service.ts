@@ -21,10 +21,7 @@ export class ProductsService {
     const products = await this.productModel.find().exec();
 
     return products.map((product) =>
-      plainToInstance(Product, {
-        id: product.id,
-        ...product.toObject({ versionKey: false }),
-      }),
+      plainToInstance(Product, product.toObject({ versionKey: false })),
     );
   }
 
@@ -35,10 +32,7 @@ export class ProductsService {
       throw new NotFoundException('Product not found!');
     }
 
-    return plainToInstance(Product, {
-      id: product.id,
-      ...product.toObject({ versionKey: false }),
-    });
+    return plainToInstance(Product, product.toObject({ versionKey: false }));
   }
 
   async update(
@@ -53,18 +47,15 @@ export class ProductsService {
       throw new NotFoundException('Product not found!');
     }
 
-    Object.assign(product, updateProductDto);
+    // Object.assign(product, updateProductDto);
+    // Тука идеята е че взимам ъпдейтнатия обект, за да го върна, ама не съм сигурен дали трябва, защото ппц update не трябва ли да връща празен респонс
+    const newProduct = await this.productModel.findById(id).exec();
 
-    // return plainToInstance(Product, {
-    //   id: product.id,
-    //   name: product.name,
-    //   price: product.price,
-    //   barcode: product.barcode,
-    // });
-    return plainToInstance(Product, {
-      id: product.id,
-      ...product.toObject({ versionKey: false }),
-    });
+    if (!newProduct) {
+      throw new NotFoundException('Product not found!');
+    }
+
+    return plainToInstance(Product, newProduct.toObject({ versionKey: false }));
   }
 
   async remove(id: string) {
